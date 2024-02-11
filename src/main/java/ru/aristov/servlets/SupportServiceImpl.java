@@ -10,7 +10,6 @@ public class SupportServiceImpl implements SupportService {
             "3", "Держись"
     ));
 
-
     @Override
     public String getPhrase() {
         if (phrases.isEmpty()) {

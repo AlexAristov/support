@@ -9,7 +9,9 @@ import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 
 public class SupportServlet extends HttpServlet {
+    private ApplicationContext context;
     private SupportManager supportManager = new ApplicationContext().getInstance(SupportManager.class);
+    private SupportController supportControllers = new ApplicationContext().getInstance(SupportController.class);
 
     public SupportServlet() throws InvocationTargetException, IllegalAccessException {
     }
@@ -17,14 +19,14 @@ public class SupportServlet extends HttpServlet {
     @Override
     public void init() {
         // this method don't run
-//        try {
-//            ApplicationContext context = new ApplicationContext();
-//            supportManager = context.getInstance(SupportManagerImpl.class);
-//        } catch (InvocationTargetException e) {
-//            throw new RuntimeException(e);
-//        } catch (IllegalAccessException e) {
-//            throw new RuntimeException(e);
-//        }
+        try {
+            ApplicationContext context = new ApplicationContext();
+            supportManager = context.getInstance(SupportManagerImpl.class);
+        } catch (InvocationTargetException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

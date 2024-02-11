@@ -1,6 +1,6 @@
 package ru.aristov.servlets;
 
-@Logged
+
 public class SupportManagerImpl implements SupportManager{
 
     private final SupportService supportService;

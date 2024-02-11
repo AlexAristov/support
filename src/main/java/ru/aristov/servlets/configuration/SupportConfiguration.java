@@ -1,15 +1,12 @@
 package ru.aristov.servlets.configuration;
 
-import ru.aristov.servlets.SupportManager;
-import ru.aristov.servlets.SupportManagerImpl;
-import ru.aristov.servlets.SupportService;
-import ru.aristov.servlets.SupportServiceImpl;
+import ru.aristov.servlets.*;
 
 @Configuration
 public class SupportConfiguration {
     @Instance
-    public SupportManager supportManager () {
-        return new SupportManagerImpl(supportService());
+    public SupportManager supportManager (SupportService supportService) {
+        return new SupportManagerImpl(supportService);
     }
 
     @Instance

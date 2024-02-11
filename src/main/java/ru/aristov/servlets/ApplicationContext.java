@@ -6,6 +6,7 @@ import ru.aristov.servlets.configuration.Instance;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.*;
 
 public class ApplicationContext {
@@ -36,10 +37,30 @@ public class ApplicationContext {
                     .filter(method -> method.isAnnotationPresent(Instance.class))
                     .toList();
 
-            for (Method method : methods) {
-                instances.put(method.getReturnType(), method.invoke(configuration));
+            List<Method> methodsWithoutParams = methods.stream().filter(method -> method.getParameters().length == 0).toList();
+            List<Method> methodsWithParams = methods.stream().filter(method -> method.getParameters().length > 0).toList();
+
+            for (Method method : methodsWithoutParams) {
+                 Object instance = wrapWithLoggingProxy(method.invoke(configuration));
+                instances.put(method.getReturnType(), instance);
+            }
+
+            for (Method method : methodsWithParams) {
+                Object[] array = Arrays.stream(method.getParameters())
+                        .map(parameter -> instances.get(parameter.getType()))
+                        .toArray();
+                Object instance = wrapWithLoggingProxy(method.invoke(configuration, array));
+                instances.put(method.getReturnType(), instance);
             }
         }
+    }
+
+    private Object wrapWithLoggingProxy(Object object) {
+        return Proxy.newProxyInstance(
+                object.getClass().getClassLoader(),
+                object.getClass().getInterfaces(),
+                new LoggingInvocationHandler(object)
+        );
     }
 
     public <T> T getInstance(Class<T> type) {
