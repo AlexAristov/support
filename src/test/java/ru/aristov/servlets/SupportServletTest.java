@@ -2,6 +2,7 @@ package ru.aristov.servlets;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestTemplate;
 import org.mockito.Mock;
 
 import javax.servlet.http.HttpServletRequest;
@@ -9,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -25,6 +27,9 @@ class SupportServletTest {
     private final HttpServletRequest request = mock(HttpServletRequest.class);
 
     private final HttpServletResponse response = mock(HttpServletResponse.class);
+
+    SupportServletTest() throws InvocationTargetException, IllegalAccessException {
+    }
 
     @BeforeEach
     void setUp() {
@@ -68,5 +73,11 @@ class SupportServletTest {
         when(response.getWriter()).thenReturn(new PrintWriter(writer));
         supportServlet.doPost(request, response);
         assertEquals("Ничего не добавлено!", sw.toString());
+    }
+    @Test
+    public void support_servlet_should_return_support_phrase () throws InvocationTargetException, IllegalAccessException {
+//        ApplicationContext  context = new ApplicationContext();
+//        SupportManager supportService = context.getInstance(SupportManager.class);
+//        assertEquals("qwe", supportService.provideSupport());
     }
 }

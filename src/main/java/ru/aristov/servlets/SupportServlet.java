@@ -1,19 +1,31 @@
 package ru.aristov.servlets;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.lang.reflect.InvocationTargetException;
 
 public class SupportServlet extends HttpServlet {
-    private final Map<String, String> phrases = new ConcurrentHashMap<>(Map.of(
-            "1", "Все будет отлично",
-            "2", "Никогда не сдавайся",
-            "3", "Держись"
-    ));
+    private SupportManager supportManager = new ApplicationContext().getInstance(SupportManager.class);
+
+    public SupportServlet() throws InvocationTargetException, IllegalAccessException {
+    }
+
+    @Override
+    public void init() {
+        // this method don't run
+//        try {
+//            ApplicationContext context = new ApplicationContext();
+//            supportManager = context.getInstance(SupportManagerImpl.class);
+//        } catch (InvocationTargetException e) {
+//            throw new RuntimeException(e);
+//        } catch (IllegalAccessException e) {
+//            throw new RuntimeException(e);
+//        }
+    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -21,7 +33,7 @@ public class SupportServlet extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
         PrintWriter writer = response.getWriter();
 
-        String message = getPhrase();
+        String message = supportManager.provideSupport();
         writer.write(message);
     }
 
@@ -32,30 +44,12 @@ public class SupportServlet extends HttpServlet {
         PrintWriter writer = response.getWriter();
 
         String phrase = request.getParameter("phrase");
-        String addPhrase = setPhrase(phrase);
-        if (!isPhraseEmpty(addPhrase)) {
+        String addPhrase = supportManager.addSupportPhrase(phrase);
+        if (!this.isPhraseEmpty(addPhrase)) {
             writer.write(addPhrase + " - фраза добавлена");
         } else {
             writer.write("Ничего не добавлено!");
         }
-    }
-
-    private String getPhrase() {
-        if (phrases.isEmpty()) {
-            return "Sorry! Нет слов поддержки";
-        }
-        List<String> keys = new ArrayList<>(phrases.keySet());
-        Random random = new Random();
-        int index = random.nextInt(keys.size());
-        return phrases.get(keys.get(index));
-    }
-
-    private String setPhrase(String phrase) {
-        if (!isPhraseEmpty(phrase)) {
-            Date date = new Date();
-            phrases.put(date.toString(), phrase);
-        }
-        return phrase;
     }
 
     private boolean isPhraseEmpty (String phrase) {
