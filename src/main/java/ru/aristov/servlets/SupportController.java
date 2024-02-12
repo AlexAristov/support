@@ -7,4 +7,14 @@ public class SupportController implements Controller{
 //
 //    }
 
+
+    @Override
+    public String path() {
+        return null;
+    }
+
+    @Override
+    public ControllerMethod getControllerMethod() {
+        return ControllerMethod.GET;
+    }
 }
