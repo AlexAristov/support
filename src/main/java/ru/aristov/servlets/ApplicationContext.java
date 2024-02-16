@@ -6,53 +6,103 @@ import ru.aristov.servlets.configuration.Instance;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.lang.reflect.Proxy;
 import java.util.*;
 
 public class ApplicationContext {
 
-    private final Map<Class<?>, Object> instances = new HashMap<>();
+    private final Map<String, Object> instances = new HashMap<>();
+    private Map<Class<?>, Object> configInstances = new HashMap<>();
+    private List<Method> instanceMethtods = new ArrayList<>();
+    private Set<String> instancesInLoading = new HashSet<>();
 
-    public ApplicationContext() throws InvocationTargetException, IllegalAccessException {
-        Reflections reflections = new Reflections("ru.aristov.servlets.configuration");
-        List<?> configurations = reflections.getTypesAnnotatedWith(Configuration.class)
-            .stream()
-            .map(type -> {
-                try {
-                    return type.getDeclaredConstructor().newInstance();
-                } catch (InstantiationException e) {
-                    throw new RuntimeException(e);
-                } catch (IllegalAccessException e) {
-                    throw new RuntimeException(e);
-                } catch (InvocationTargetException e) {
-                    throw new RuntimeException(e);
-                } catch (NoSuchMethodException e) {
-                    throw new RuntimeException(e);
+    public ApplicationContext(String packageName) throws InvocationTargetException, IllegalAccessException {
+        scanConfigurationClasses(packageName);
+        init();
+    }
+
+    public void scanConfigurationClasses (String packageName) {
+        Reflections reflections = new Reflections(packageName);
+        Set<Class<?>> configurationClasses = reflections.getTypesAnnotatedWith(Configuration.class);
+        for (Class<?> configurationClass : configurationClasses) {
+            try {
+                Object configurationInstance = configurationClass.getDeclaredConstructor().newInstance();
+                configInstances.put(configurationClass, configurationInstance);
+                for (Method method : configurationClass.getDeclaredMethods()) {
+                    if (method.isAnnotationPresent(Instance.class)) {
+                        instanceMethtods.add(method);
+                    }
                 }
-            })
-            .toList();
 
-        for (Object configuration : configurations) {
-            List<Method> methods = Arrays.stream(configuration.getClass().getMethods())
-                    .filter(method -> method.isAnnotationPresent(Instance.class))
-                    .toList();
-
-            List<Method> methodsWithoutParams = methods.stream().filter(method -> method.getParameters().length == 0).toList();
-            List<Method> methodsWithParams = methods.stream().filter(method -> method.getParameters().length > 0).toList();
-
-            for (Method method : methodsWithoutParams) {
-                 Object instance = wrapWithLoggingProxy(method.invoke(configuration));
-                instances.put(method.getReturnType(), instance);
-            }
-
-            for (Method method : methodsWithParams) {
-                Object[] array = Arrays.stream(method.getParameters())
-                        .map(parameter -> instances.get(parameter.getType()))
-                        .toArray();
-                Object instance = wrapWithLoggingProxy(method.invoke(configuration, array));
-                instances.put(method.getReturnType(), instance);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
             }
         }
+
+    }
+
+    public void init () {
+        instanceMethtods.stream()
+            .sorted(Comparator.comparingInt((Method method) -> method.getAnnotation(Instance.class).priority()).reversed())
+            .forEach(method -> createInstance(method.getName(), method));
+    }
+
+    private Object createInstance (String instanceName, Method method) {
+        if (instancesInLoading.contains(instanceName)) {
+            throw new RuntimeException("Circular dependency: " + instanceName);
+        } else {
+            instancesInLoading.add(instanceName);
+
+            try {
+                Object configInstance = configInstances.get(method.getDeclaringClass());
+                Object[] dependencies = resolveDependencies(method);
+                Object instance = method.invoke(configInstance, dependencies);
+                instances.put(instanceName, applyProxies(instance));
+                return instance;
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            } finally {
+                instancesInLoading.remove(instanceName);
+            }
+
+        }
+    }
+
+    private <T> Object applyProxies (Object object) {
+        Object result = object;
+        for (ProxyApplier applier : getInstances(ProxyApplier.class)) {
+            result = applier.apply(result);
+        }
+        return result;
+    }
+
+    private Object[] resolveDependencies (Method method) {
+        return Arrays.stream(method.getParameterTypes())
+                .map(this::getInstance)
+                .toArray();
+    }
+
+    public <T> T getInstance (Class<T> instanceType) {
+        return (T) instances.values().stream()
+                .filter(instanceType::isInstance)
+                .findFirst()
+                .orElseGet(() -> createInstanceByType(instanceType));
+    }
+
+    public <T> List<T> getInstances (Class<T> instanceType) {
+        return (List<T>) instances.values().stream()
+                .filter(instanceType::isInstance)
+                .toList();
+    }
+
+    private Object createInstanceByType (Class<?> instanceType) {
+        for (Method method : instanceMethtods) {
+            if (instanceType.isAssignableFrom(method.getReturnType())) {
+                return createInstance(method.getName(), method);
+            }
+        }
+        throw new RuntimeException("Not found instance");
     }
 
     private Object wrapWithLoggingProxy(Object object) {
@@ -63,8 +113,8 @@ public class ApplicationContext {
         );
     }
 
-    public <T> T getInstance(Class<T> type) {
-        return (T) Optional.ofNullable(this.instances.get(type)).orElseThrow();
-    }
+//    public <T> T getInstance(Class<T> type) {
+//        return (T) Optional.ofNullable(this.instances.get(type)).orElseThrow();
+//    }
 
 }

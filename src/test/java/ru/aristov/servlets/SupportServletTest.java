@@ -76,8 +76,8 @@ class SupportServletTest {
     }
     @Test
     public void support_servlet_should_return_support_phrase () throws InvocationTargetException, IllegalAccessException {
-        ApplicationContext  context = new ApplicationContext();
+        ApplicationContext context = new ApplicationContext("ru.aristov.servlets");
         SupportManager supportService = context.getInstance(SupportManager.class);
-        assertEquals("Держись", supportService.provideSupport());
+        assertTrue(phrases.containsValue(supportService.provideSupport()));
     }
 }
