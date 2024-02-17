@@ -1,13 +1,12 @@
 package ru.aristov.servlets;
 
 import org.reflections.Reflections;
+import ru.aristov.servlets.proxies.ProxyApplier;
 import ru.aristov.servlets.configuration.Configuration;
 import ru.aristov.servlets.configuration.Instance;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
-import java.lang.reflect.Proxy;
 import java.util.*;
 
 public class ApplicationContext {
@@ -56,8 +55,8 @@ public class ApplicationContext {
 
             try {
                 Object configInstance = configInstances.get(method.getDeclaringClass());
-                Object[] dependencies = resolveDependencies(method);
-                Object instance = method.invoke(configInstance, dependencies);
+                Object[] parameters = getParameters(method);
+                Object instance = method.invoke(configInstance, parameters);
                 instances.put(instanceName, applyProxies(instance));
                 return instance;
             } catch (Exception e) {
@@ -65,7 +64,6 @@ public class ApplicationContext {
             } finally {
                 instancesInLoading.remove(instanceName);
             }
-
         }
     }
 
@@ -77,7 +75,7 @@ public class ApplicationContext {
         return result;
     }
 
-    private Object[] resolveDependencies (Method method) {
+    private Object[] getParameters (Method method) {
         return Arrays.stream(method.getParameterTypes())
                 .map(this::getInstance)
                 .toArray();
@@ -96,6 +94,10 @@ public class ApplicationContext {
                 .toList();
     }
 
+    public List<Object> getAllInstances () {
+        return instances.values().stream().toList();
+    }
+
     private Object createInstanceByType (Class<?> instanceType) {
         for (Method method : instanceMethtods) {
             if (instanceType.isAssignableFrom(method.getReturnType())) {
@@ -104,17 +106,4 @@ public class ApplicationContext {
         }
         throw new RuntimeException("Not found instance");
     }
-
-    private Object wrapWithLoggingProxy(Object object) {
-        return Proxy.newProxyInstance(
-                object.getClass().getClassLoader(),
-                object.getClass().getInterfaces(),
-                new LoggingInvocationHandler(object)
-        );
-    }
-
-//    public <T> T getInstance(Class<T> type) {
-//        return (T) Optional.ofNullable(this.instances.get(type)).orElseThrow();
-//    }
-
 }

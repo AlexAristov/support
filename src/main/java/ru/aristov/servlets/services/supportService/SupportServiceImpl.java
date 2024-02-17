@@ -1,4 +1,4 @@
-package ru.aristov.servlets;
+package ru.aristov.servlets.services.supportService;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -11,26 +11,26 @@ public class SupportServiceImpl implements SupportService {
     ));
 
     @Override
-    public String getPhrase() {
+    public SupportPhrase getPhrase() {
         if (phrases.isEmpty()) {
-            return "Sorry! Нет слов поддержки";
+            return new SupportPhrase("Sorry! Нет слов поддержки");
         }
         List<String> keys = new ArrayList<>(phrases.keySet());
         Random random = new Random();
         int index = random.nextInt(keys.size());
-        return phrases.get(keys.get(index));
+        return new SupportPhrase(phrases.get(keys.get(index)));
     }
 
     @Override
-    public String setPhrase(String phrase) {
-        if (!isPhraseEmpty(phrase)) {
+    public SupportPhrase setPhrase(SupportPhrase supportPhrase) {
+        if (!isPhraseEmpty(supportPhrase)) {
             Date date = new Date();
-            phrases.put(date.toString(), phrase);
+            phrases.put(date.toString(), supportPhrase.phrase().toString());
         }
-        return phrase;
+        return supportPhrase;
     }
 
-    private boolean isPhraseEmpty (String phrase) {
-        return phrase == null || phrase.isEmpty();
+    private boolean isPhraseEmpty (SupportPhrase supportPhrase) {
+        return supportPhrase == null || supportPhrase.phrase().isEmpty();
     }
 }

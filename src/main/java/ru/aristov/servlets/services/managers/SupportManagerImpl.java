@@ -1,5 +1,8 @@
-package ru.aristov.servlets;
+package ru.aristov.servlets.services.managers;
 
+
+import ru.aristov.servlets.services.supportService.SupportPhrase;
+import ru.aristov.servlets.services.supportService.SupportService;
 
 public class SupportManagerImpl implements SupportManager{
 
@@ -9,11 +12,11 @@ public class SupportManagerImpl implements SupportManager{
         this.supportService = supportService;
     }
 
-    public String provideSupport() {
+    public SupportPhrase provideSupport() {
         return supportService.getPhrase();
     }
 
-    public String addSupportPhrase(String phrase) {
+    public SupportPhrase addSupportPhrase(SupportPhrase phrase) {
         return supportService.setPhrase(phrase);
     }
 }

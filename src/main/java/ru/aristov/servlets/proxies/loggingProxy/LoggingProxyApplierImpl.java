@@ -1,4 +1,8 @@
-package ru.aristov.servlets;
+package ru.aristov.servlets.proxies.loggingProxy;
+
+import ru.aristov.servlets.controllers.Logged;
+import ru.aristov.servlets.proxies.ProxyApplier;
+import ru.aristov.servlets.controllers.Controller;
 
 import java.lang.reflect.Proxy;
 import java.util.Arrays;
@@ -7,7 +11,7 @@ public class LoggingProxyApplierImpl implements ProxyApplier {
     @Override
     public Object apply(Object object) {
         boolean isProxyApplier = Arrays.stream(object.getClass().getInterfaces())
-                .anyMatch(it -> it.isAnnotationPresent(ControllerAnnotation.class));
+                .anyMatch(it -> it.isAnnotationPresent(Controller.class));
         if (isProxyApplier) {
             return Proxy.newProxyInstance(
                 object.getClass().getClassLoader(),
