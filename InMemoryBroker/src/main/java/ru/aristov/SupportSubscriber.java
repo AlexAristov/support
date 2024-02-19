@@ -1,14 +1,13 @@
 package ru.aristov;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-@Component
 public class SupportSubscriber implements Runnable{
-    @Autowired
-    private SupportMessageQueue queue;
-    @Autowired
-    private  SupportService supportService;
+    private final MessageQueue queue;
+    private final SupportService supportService;
+
+    public SupportSubscriber(MessageQueue queue, SupportService supportService) {
+        this.queue = queue;
+        this.supportService = supportService;
+    }
 
     @Subscriber
     @Override

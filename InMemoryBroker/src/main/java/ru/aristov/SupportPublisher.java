@@ -1,12 +1,9 @@
 package ru.aristov;
 
-import org.springframework.stereotype.Component;
-
-@Component
 public class SupportPublisher implements Publisher{
-    private final SupportMessageQueue queue;
+    private final MessageQueue queue;
 
-    public SupportPublisher(SupportMessageQueue queue) {
+    public SupportPublisher(MessageQueue queue) {
         this.queue = queue;
     }
 

@@ -10,9 +10,14 @@
   <groupId>ru.aristov</groupId>
   <artifactId>support</artifactId>
   <version>1.0</version>
+  <packaging>pom</packaging>
   <properties>
     <java.version>17</java.version>
   </properties>
+  <modules>
+    <module>InMemoryBroker</module>
+    <module>SupportModule</module>
+  </modules>
 
   <dependencies>
     <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine -->

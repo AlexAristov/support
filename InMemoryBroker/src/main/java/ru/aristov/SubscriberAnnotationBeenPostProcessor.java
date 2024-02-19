@@ -2,12 +2,10 @@ package ru.aristov;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
-import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
 import java.util.*;
 
-@Component
 public class SubscriberAnnotationBeenPostProcessor implements BeanPostProcessor {
     private final Map<String, Object> beansToRun = new HashMap<>();
     @Override

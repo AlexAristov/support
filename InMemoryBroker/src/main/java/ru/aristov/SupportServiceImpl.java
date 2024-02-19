@@ -1,12 +1,9 @@
 package ru.aristov;
 
-import lombok.RequiredArgsConstructor;
-
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-@RequiredArgsConstructor
-public class SupportService {
+public class SupportServiceImpl implements SupportService {
     private final Map<String, String> phrases = new ConcurrentHashMap<>(Map.of(
             "1", "Все будет отлично",
             "2", "Никогда не сдавайся",
