@@ -7,7 +7,7 @@
     
     <servlet>
         <servlet-name>SupportServlet</servlet-name>
-        <servlet-class>ru.aristov.servlets.SupportServlet</servlet-class>
+        <servlet-class>ru.aristov.servlets.DispatcherServlet</servlet-class>
     </servlet>
     
     <servlet-mapping>
