@@ -3,6 +3,7 @@ package ru.aristov.servlets;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import ru.aristov.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -22,51 +23,30 @@ class SupportServletTest {
             "3", "Держись"
     ));
 
-    private final HttpServletRequest request = mock(HttpServletRequest.class);
-
-    private final HttpServletResponse response = mock(HttpServletResponse.class);
-
     @BeforeEach
     void setUp() {
 
     }
+    @Mock
+    private SupportMessageQueue queue = new SupportMessageQueue();
+    @Mock
+    private Publisher publisher = new SupportPublisher(queue);
+    @Mock
+    private SupportService supportService = new SupportService();
 
     @Mock
-    private SupportServlet supportServlet = new SupportServlet();
+    private SupportController supportController = new SupportController(publisher, supportService);
 
     @Test
     void doGet() throws IOException {
-        StringWriter sw = new StringWriter();
-        PrintWriter writer = new PrintWriter(sw);
-
-        when(response.getWriter()).thenReturn(new PrintWriter(writer));
-        supportServlet.doGet(request, response);
-        assertTrue(phrases.containsValue(sw.toString()));
+        SupportPhrase supportPhrase = supportController.getSupportPhrase();
+        assertTrue(phrases.containsValue(supportPhrase.phrase()));
     }
 
     @Test
     void doPostWithPhrase() throws IOException {
         String phrase = "Ты все сможешь";
-        when(request.getParameter("phrase")).thenReturn(phrase);
-
-        StringWriter sw = new StringWriter();
-        PrintWriter writer = new PrintWriter(sw);
-
-        when(response.getWriter()).thenReturn(new PrintWriter(writer));
-        supportServlet.doPost(request, response);
-        assertEquals(sw.toString(), phrase + " - фраза добавлена");
-    }
-
-    @Test
-    void doPostWithoutPhrase() throws IOException {
-        String phrase = "";
-        when(request.getParameter("phrase")).thenReturn(phrase);
-
-        StringWriter sw = new StringWriter();
-        PrintWriter writer = new PrintWriter(sw);
-
-        when(response.getWriter()).thenReturn(new PrintWriter(writer));
-        supportServlet.doPost(request, response);
-        assertEquals("Ничего не добавлено!", sw.toString());
+        SupportPhrase supportPhrase = supportController.addSupportPhrase(new SupportPhrase(phrase));
+        assertEquals(phrase, supportPhrase.phrase());
     }
 }
