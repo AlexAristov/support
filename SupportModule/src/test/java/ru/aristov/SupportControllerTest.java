@@ -4,7 +4,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import ru.aristov.configurations.AppConfig;
+import ru.aristov.consumers.KafkaClient;
+import ru.aristov.controllers.SupportController;
+import ru.aristov.models.SupportPhrase;
+import ru.aristov.repositories.SupportRepository;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -19,11 +26,9 @@ class SupportControllerTest {
             "3", "Держись"
     ));
     @Autowired
-    private MessageQueue queue;
+    private KafkaClient kafkaClient;
     @Autowired
-    private Publisher publisher;
-    @Autowired
-    private SupportService supportService;
+    private SupportRepository supportRepository;
     @Autowired
     private SupportController supportController;
 
@@ -36,7 +41,10 @@ class SupportControllerTest {
     @Test
     void addSupportPhrase() {
         String phrase = "Ты все сможешь";
-        SupportPhrase supportPhrase = supportController.addSupportPhrase(new SupportPhrase(phrase));
-        assertEquals(phrase, supportPhrase.phrase());
+        supportController.addSupportPhrase(new SupportPhrase(phrase));
+        List<SupportPhrase> list = new ArrayList<>();
+        list.add(new SupportPhrase(phrase));
+        kafkaClient.listen(list);
+        assertTrue(supportRepository.getAllSupportPhrase().containsValue(phrase));
     }
 }
