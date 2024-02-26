@@ -1,7 +1,7 @@
 package ru.aristov;
 
 public interface SupportService {
-    SupportPhrase getSupportPhrase();
+    SupportPhrase2 getSupportPhrase();
 
-    void addSupportPhrase(SupportPhrase supportPhrase);
+    void addSupportPhrase(SupportPhrase2 supportPhrase);
 }

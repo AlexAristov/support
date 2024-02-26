@@ -1,6 +1,6 @@
 package ru.aristov;
 
-public record SupportPhrase (
+public record SupportPhrase(
         String phrase
 ) {
 

@@ -23,7 +23,7 @@ public class SupportSubscriber implements Runnable{
             } else {
                 String message = queue.poll();
                 if (message != null) {
-                    supportService.addSupportPhrase(new SupportPhrase(message));
+                    supportService.addSupportPhrase(new SupportPhrase2(message));
                 } else {
                     try {
                         Thread.sleep(1000);

@@ -10,23 +10,23 @@ public class SupportServiceImpl implements SupportService {
             "3", "Держись"
     ));
 
-    public SupportPhrase getSupportPhrase() {
+    public SupportPhrase2 getSupportPhrase() {
         if (phrases.isEmpty()) {
-            return new SupportPhrase("Sorry! Нет слов поддержки");
+            return new SupportPhrase2("Sorry! Нет слов поддержки");
         }
         List<String> keys = new ArrayList<>(phrases.keySet());
         Random random = new Random();
         int index = random.nextInt(keys.size());
-        return new SupportPhrase(phrases.get(keys.get(index)));
+        return new SupportPhrase2(phrases.get(keys.get(index)));
     };
-    public void addSupportPhrase(SupportPhrase supportPhrase) {
+    public void addSupportPhrase(SupportPhrase2 supportPhrase) {
         if (!isPhraseEmpty(supportPhrase)) {
             Date date = new Date();
             phrases.put(date.toString(), supportPhrase.phrase());
         }
     }
 
-    private boolean isPhraseEmpty (SupportPhrase supportPhrase) {
+    private boolean isPhraseEmpty (SupportPhrase2 supportPhrase) {
         return supportPhrase == null || supportPhrase.phrase().isEmpty();
     }
 }
