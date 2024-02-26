@@ -1,4 +1,6 @@
-package ru.aristov;
+package ru.aristov.services;
+
+import ru.aristov.models.SupportPhrase;
 
 import java.util.Map;
 

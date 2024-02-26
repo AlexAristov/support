@@ -1,18 +1,15 @@
-package ru.aristov;
+package ru.aristov.services;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
+import ru.aristov.models.SupportPhrase;
+import ru.aristov.repositories.SupportRepository;
 
-import java.util.Map;
-
-public class SupportServiceKafkaImpl implements SupportService {
-
+import java.util.*;
+@Component
+@RequiredArgsConstructor
+public class SupportServiceImpl implements SupportService {
     SupportRepository phrases;
-    DataSender dataSenderKafka;
-
-    public SupportServiceKafkaImpl(SupportRepository phrases, DataSender dataSenderKafka) {
-        this.phrases = phrases;
-        this.dataSenderKafka = dataSenderKafka;
-    }
 
     public SupportPhrase getSupportPhrase() {
         if (phrases.getAllSupportPhrase().isEmpty()) {
@@ -25,8 +22,7 @@ public class SupportServiceKafkaImpl implements SupportService {
     };
     public void addSupportPhrase(SupportPhrase supportPhrase) {
         if (!isPhraseEmpty(supportPhrase)) {
-//            phrases.addSupportPhrase(supportPhrase);
-            dataSenderKafka.send(supportPhrase);
+            phrases.addSupportPhrase(supportPhrase);
         }
     }
 

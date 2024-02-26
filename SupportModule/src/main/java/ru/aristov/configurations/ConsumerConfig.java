@@ -13,10 +13,13 @@ import org.springframework.kafka.config.KafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
-import org.springframework.kafka.support.JacksonUtils;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.scheduling.concurrent.ConcurrentTaskExecutor;
-import ru.aristov.*;
+import ru.aristov.consumers.KafkaClient;
+import ru.aristov.consumers.SupportPhraseConsumer;
+import ru.aristov.consumers.SupportPhraseConsumerImpl;
+import ru.aristov.models.SupportPhrase;
+import ru.aristov.repositories.SupportRepository;
 
 import java.util.Map;
 import java.util.concurrent.Executors;
@@ -39,7 +42,7 @@ public class ConsumerConfig {
         Map<String, Object> properties = kafkaProperties.buildConsumerProperties();
         properties.put(org.apache.kafka.clients.consumer.ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         properties.put(org.apache.kafka.clients.consumer.ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
-        properties.put(JsonDeserializer.TYPE_MAPPINGS, "ru.aristov.SupportPhrase:ru.aristov.SupportPhrase");
+        properties.put(JsonDeserializer.TYPE_MAPPINGS, "ru.aristov.models.SupportPhrase:ru.aristov.models.SupportPhrase");
         properties.put(org.apache.kafka.clients.consumer.ConsumerConfig.MAX_POLL_RECORDS_CONFIG, 3);
         properties.put(org.apache.kafka.clients.consumer.ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, 3000);
 
@@ -56,7 +59,8 @@ public class ConsumerConfig {
         factory.setConsumerFactory(consumerFactory);
         // получить пачку сообщений
         factory.setBatchListener(true);
-        factory.setConcurrency(1);
+
+        factory.setConcurrency(concurrency);
         factory.getContainerProperties().setIdleBetweenPolls(1000);
         factory.getContainerProperties().setPollTimeout(1000);
 
@@ -67,12 +71,12 @@ public class ConsumerConfig {
     }
 
     @Bean
-    public StringValueConsumer stringValueConsumerLogger(SupportRepository supportRepository) {
-        return new StringValueConsumerLogger(supportRepository);
+    public SupportPhraseConsumer stringValueConsumerLogger(SupportRepository supportRepository) {
+        return new SupportPhraseConsumerImpl(supportRepository);
     }
 
     @Bean
-    public KafkaClient kafkaClient(StringValueConsumer stringValueConsumer) {
+    public KafkaClient kafkaClient(SupportPhraseConsumer stringValueConsumer) {
         return new KafkaClient(stringValueConsumer);
     }
 }

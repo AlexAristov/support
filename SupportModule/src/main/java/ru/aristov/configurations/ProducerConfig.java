@@ -15,10 +15,9 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.support.JacksonUtils;
 import org.springframework.kafka.support.serializer.JsonSerializer;
-import ru.aristov.DataSender;
-import ru.aristov.DataSenderKafka;
-import ru.aristov.KafkaConfigurationProperties;
-import ru.aristov.SupportPhrase;
+import ru.aristov.producers.DataSender;
+import ru.aristov.producers.DataSenderKafka;
+import ru.aristov.models.SupportPhrase;
 
 import java.util.Map;
 
@@ -70,8 +69,7 @@ public class ProducerConfig {
     ) {
         return new DataSenderKafka(
                 topic.name(),
-                kafkaTemplate,
-                supportPhrase -> System.out.println("==> !!!" + supportPhrase)
+                kafkaTemplate
         );
     }
 }

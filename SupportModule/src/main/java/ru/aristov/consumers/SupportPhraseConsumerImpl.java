@@ -1,12 +1,15 @@
-package ru.aristov;
+package ru.aristov.consumers;
+
+import ru.aristov.models.SupportPhrase;
+import ru.aristov.repositories.SupportRepository;
 
 import java.util.Collection;
 import java.util.List;
 
-public class StringValueConsumerLogger implements StringValueConsumer {
+public class SupportPhraseConsumerImpl implements SupportPhraseConsumer {
     private final SupportRepository supportRepository;
 
-    public StringValueConsumerLogger(SupportRepository supportRepository) {
+    public SupportPhraseConsumerImpl(SupportRepository supportRepository) {
         this.supportRepository = supportRepository;
     }
 
@@ -15,7 +18,6 @@ public class StringValueConsumerLogger implements StringValueConsumer {
         Collection<String> phrases = supportRepository.getAllSupportPhrase().values();
         for (var value : values) {
             if (!phrases.contains(value.phrase())) {
-                System.out.println("==> value: " + value);
                 supportRepository.addSupportPhrase(value);
             } else {
                 System.out.println("==> already exist: " + value);

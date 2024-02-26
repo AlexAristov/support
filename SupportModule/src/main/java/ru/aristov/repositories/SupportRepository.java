@@ -1,6 +1,7 @@
-package ru.aristov;
+package ru.aristov.repositories;
 
 import org.springframework.stereotype.Component;
+import ru.aristov.models.SupportPhrase;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;

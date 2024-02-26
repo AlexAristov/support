@@ -1,14 +1,15 @@
-package ru.aristov;
+package ru.aristov.consumers;
 
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.messaging.handler.annotation.Payload;
+import ru.aristov.models.SupportPhrase;
 
 import java.util.List;
 
 public class KafkaClient {
-    private final StringValueConsumer stringValueConsumer;
+    private final SupportPhraseConsumer stringValueConsumer;
 
-    public KafkaClient(StringValueConsumer stringValueConsumer) {
+    public KafkaClient(SupportPhraseConsumer stringValueConsumer) {
         this.stringValueConsumer = stringValueConsumer;
     }
 
@@ -17,7 +18,6 @@ public class KafkaClient {
             containerFactory = "listenerContainerFactory"
     )
     public void listen(@Payload List<SupportPhrase> values) {
-        System.out.println("==> values: " + values);
         stringValueConsumer.accept(values);
     }
 }

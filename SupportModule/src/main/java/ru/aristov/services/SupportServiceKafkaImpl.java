@@ -1,13 +1,19 @@
-package ru.aristov;
+package ru.aristov.services;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import ru.aristov.producers.DataSender;
+import ru.aristov.models.SupportPhrase;
+import ru.aristov.repositories.SupportRepository;
 
-import java.util.*;
-@Component
-public class SupportServiceImpl implements SupportService {
-    @Autowired
+import java.util.Map;
+
+public class SupportServiceKafkaImpl implements SupportService {
     SupportRepository phrases;
+    DataSender dataSenderKafka;
+
+    public SupportServiceKafkaImpl(SupportRepository phrases, DataSender dataSenderKafka) {
+        this.phrases = phrases;
+        this.dataSenderKafka = dataSenderKafka;
+    }
 
     public SupportPhrase getSupportPhrase() {
         if (phrases.getAllSupportPhrase().isEmpty()) {
@@ -20,7 +26,7 @@ public class SupportServiceImpl implements SupportService {
     };
     public void addSupportPhrase(SupportPhrase supportPhrase) {
         if (!isPhraseEmpty(supportPhrase)) {
-            phrases.addSupportPhrase(supportPhrase);
+            dataSenderKafka.send(supportPhrase);
         }
     }
 
