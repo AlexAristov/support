@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>2.7.0</version>
+    <version>3.2.3</version>
     <relativePath/>
   </parent>
   <groupId>ru.aristov</groupId>
@@ -15,7 +15,6 @@
     <java.version>17</java.version>
   </properties>
   <modules>
-    <module>InMemoryBroker</module>
     <module>SupportModule</module>
   </modules>
 
@@ -60,6 +59,10 @@
       <version>1.18.30</version>
       <scope>provided</scope>
     </dependency>
-
+    <!-- https://mvnrepository.com/artifact/org.springframework.kafka/spring-kafka -->
+    <dependency>
+      <groupId>org.springframework.kafka</groupId>
+      <artifactId>spring-kafka</artifactId>
+    </dependency>
   </dependencies>
 </project>

@@ -1,0 +1,17 @@
+application:
+  kafka:
+    topic: "support-topic"
+
+spring:
+  kafka:
+    producer:
+      bootstrap-servers: "127.0.0.1:9092"
+      client-id: "support-producer"
+    consumer:
+      group-id: "test-group"
+      bootstrap-servers: "127.0.0.1:9092"
+      client-id: "support-consumer"
+      auto-offset-reset: earliest
+
+kafka-broker:
+  enabled: true

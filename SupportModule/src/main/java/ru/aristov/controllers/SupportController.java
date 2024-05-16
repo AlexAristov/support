@@ -1,14 +1,17 @@
-package ru.aristov;
+package ru.aristov.controllers;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
+import ru.aristov.models.SupportPhrase;
+import ru.aristov.services.SupportService;
+
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
 public class SupportController {
-    private final Publisher publisher;
     private final SupportService supportService;
 
     @GetMapping(path = "/support")
@@ -16,8 +19,13 @@ public class SupportController {
         return supportService.getSupportPhrase();
     }
 
+    @GetMapping(path = "/supportAll")
+    public Map getAllSupportPhrase () {
+        return supportService.getAllSupportPhrase();
+    }
+
     @PostMapping(path = "/support")
-    public SupportPhrase addSupportPhrase (SupportPhrase supportPhrase) {
-        return new SupportPhrase(publisher.publishMessage(supportPhrase.phrase()));
+    public void addSupportPhrase (SupportPhrase supportPhrase) {
+        supportService.addSupportPhrase(supportPhrase);
     }
 }
